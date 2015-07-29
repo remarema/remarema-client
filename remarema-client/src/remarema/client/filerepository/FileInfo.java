@@ -21,6 +21,7 @@ public class FileInfo {
 	private String name;
 	private long lastModified;
 	private boolean directory;
+	String checksum;
 
 	public String getName() {
 		return name;
@@ -44,6 +45,14 @@ public class FileInfo {
 
 	public void setDirectory(boolean directory) {
 		this.directory = directory;
+	}
+
+	public String getChecksum() {
+		return checksum;
+	}
+
+	public void setChecksum(String checksum) {
+		this.checksum = checksum;
 	}
 
 	public boolean isInList(List<FileInfo> fileinfoList) {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -42,8 +43,10 @@ public class Client {
 	 * 
 	 * @param directory
 	 * @return Eine Liste von <code>FileInfo</code>-Objekten.
+	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
 	 */
-	public List<FileInfo> listFiles(String directory) {
+	public List<FileInfo> listFiles(String directory) throws NoSuchAlgorithmException, IOException {
 		if (repository.makeFileFromPath(directory).exists()) {
 			return repository.listFiles(directory);
 		}
@@ -150,8 +153,9 @@ public class Client {
 	 * vergleichen.
 	 * 
 	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
 	 */
-	public void synchronize() throws IOException {
+	public void synchronize() throws IOException, NoSuchAlgorithmException {
 		synchronizeDirectory(".");
 	}
 
@@ -163,8 +167,9 @@ public class Client {
 	 * 
 	 * @param directory
 	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
 	 */
-	public void synchronizeDirectory(String directory) throws IOException {
+	public void synchronizeDirectory(String directory) throws IOException, NoSuchAlgorithmException {
 		List<FileInfo> serverFiles = server.listFiles(directory);
 		List<FileInfo> clientFiles = listFiles(directory);
 
@@ -182,15 +187,18 @@ public class Client {
 	/**
 	 * Diese Methode synchronisiert Files. Es wird zu Beginn die Methode {@link #isFileUpToDate(FileInfo)} aufgerufen.
 	 * Wird <b>false</b> zurückgegeben, wird der Filename ausgelesen, um diesen an einen OutputStream übergeben zu
-	 * können.
+	 * können. Am Dateinamen wird noch die Endung <code>.part</code> angefügt.
 	 * Danach wird die Methode {@link Server#retrieveFile(String, OutputStream)} aufgerufen, um das entsprechende File
 	 * zu synchronisieren.
+	 * Im <code>finally</code>-Block wird dann der OutputStream geschlossen. War der File-Download erfolgreich, wird das
+	 * File umbenannt. Des weiteren wird das Änderungsdatum des kopierten Files manuell gesetzt.
 	 * 
 	 * @param fileInfo
 	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
 	 * 
 	 */
-	private void synchronizeFile(FileInfo fileInfo) throws IOException {
+	private void synchronizeFile(FileInfo fileInfo) throws IOException, NoSuchAlgorithmException {
 		if (!isFileUpToDate(fileInfo)) {
 			long lastModified = fileInfo.getLastModified();
 			String fileName = fileInfo.getName();
@@ -209,6 +217,20 @@ public class Client {
 				temp.setLastModified(lastModified);
 				temp.renameTo(currentFile);
 
+				String result = repository.createChecksum(currentFile);
+
+				log.info("Aktuelles File: " + currentFile.getName() + " | Hashwert : " + result);
+				log.info("Original File: " + fileInfo.getName() + " | Hashwert : " + fileInfo.getChecksum());
+
+				if (result.equals(fileInfo.getChecksum())) {
+					log.info("Download des Files " + currentFile.getName()
+								+ " war erfolgreich! Prüfsummen stimmen überein!");
+				} else {
+					log.info("Download des Files: " + currentFile.getName()
+								+ " war fehlerhaft! Prüfsummen stimmen nicht überein!");
+					currentFile.delete();
+					log.info("Fehlerhafte Datei: " + currentFile.getName() + " wurde gelöscht!");
+				}
 			}
 		} else {
 			if (log.isLoggable(DEBUG)) {

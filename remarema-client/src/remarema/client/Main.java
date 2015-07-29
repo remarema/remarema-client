@@ -2,6 +2,7 @@ package remarema.client;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,8 +23,9 @@ public class Main {
 	/**
 	 * @param args
 	 * @throws IOException
+	 * @throws NoSuchAlgorithmException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
 		// legt den kleinsten log level fest
 		Level minimumLogLevel = Level.FINE;
 
