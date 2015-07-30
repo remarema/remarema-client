@@ -21,7 +21,7 @@ public class FileInfo {
 	private String name;
 	private long lastModified;
 	private boolean directory;
-	String checksum;
+	private String checksum;
 
 	public String getName() {
 		return name;

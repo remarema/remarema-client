@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import remarema.client.checksum.ChecksumCreator;
 import remarema.client.filerepository.FileInfo;
 import remarema.client.filerepository.FileRepository;
 
@@ -33,9 +34,14 @@ public class Client {
 	 * @param rootDirectory
 	 */
 	public Client(Server server, File rootDirectory) {
-		this.server = server;
-		this.repository = new FileRepository(rootDirectory);
+		this(server, new FileRepository(rootDirectory));
 	}
+
+	public Client(Server server, FileRepository repository) {
+		this.server = server;
+		this.repository = repository;
+	}
+
 
 	/**
 	 * Die Methode <code>listFiles</code> speichert alle Verzeichnisse und Dateien aus dem lokalen FileRepository in
@@ -217,7 +223,8 @@ public class Client {
 				temp.setLastModified(lastModified);
 				temp.renameTo(currentFile);
 
-				String result = repository.createChecksum(currentFile);
+				ChecksumCreator checksum = new ChecksumCreator(currentFile);
+				String result = checksum.createChecksum();
 
 				log.info("Aktuelles File: " + currentFile.getName() + " | Hashwert : " + result);
 				log.info("Original File: " + fileInfo.getName() + " | Hashwert : " + fileInfo.getChecksum());

@@ -48,7 +48,7 @@ public class Main {
 	/**
 	 * Zentraler Logger für alle Klassen der Client Bibliothek
 	 * 
-	 * @return
+	 * @return Logger
 	 */
 	public static Logger getLogger() {
 		return Logger.getLogger(LOGGER_NAME);
