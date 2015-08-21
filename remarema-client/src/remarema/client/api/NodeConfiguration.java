@@ -1,13 +1,33 @@
 package remarema.client.api;
 
-import java.net.URL;
-
-
 public class NodeConfiguration {
 
 	private String nodeName;
 	private String clusterName;
+	private String supernodeURL;
 
-	private URL supernode;
+	public String getNodeName() {
+		return nodeName;
+	}
+
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
+	}
+
+	public String getClusterName() {
+		return clusterName;
+	}
+
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
+	}
+
+	public String getSupernodeURL() {
+		return supernodeURL;
+	}
+
+	public void setSupernode(String supernodeURL) {
+		this.supernodeURL = supernodeURL;
+	}
 
 }

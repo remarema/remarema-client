@@ -38,10 +38,6 @@ public class FileRepository {
 		info.setName(createRelativeFileName(file));
 		info.setLastModified(file.lastModified());
 		info.setDirectory(file.isDirectory());
-		if (!file.isDirectory()) {
-			ChecksumCreator checksum = new ChecksumCreator(file);
-			info.setChecksum(checksum.createChecksum());
-		}
 		return info;
 	}
 
@@ -52,10 +48,12 @@ public class FileRepository {
 	 * @return Es wird der relative Filename einer Datei zurückgegeben.
 	 */
 	private String createRelativeFileName(File file) {
-		String rootURI = rootDirectory.toURI().toString();
-		String fileURI = file.toURI().toString();
+		
+		String rootURI = rootDirectory.getAbsolutePath();
+		String fileURI = file.getAbsolutePath();
 		String name = fileURI.substring(rootURI.length());
-		return name;
+		// replace backslashes to slashes and remove leading slash
+		return name.substring(1).replace('\\', '/');
 	}
 
 	/**

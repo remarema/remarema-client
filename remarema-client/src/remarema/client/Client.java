@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import remarema.client.api.NodeConfiguration;
 import remarema.client.checksum.ChecksumCreator;
 import remarema.client.filerepository.FileInfo;
 import remarema.client.filerepository.FileRepository;
@@ -41,18 +42,38 @@ public class Client {
 		this.server = server;
 		this.repository = repository;
 	}
-
+	
+	public NodeConfiguration getConfigurationForNode(String nodeName){
+		NodeConfiguration configuration = server.getConfigurationForNode(nodeName);
+		return configuration;
+	}
+	
+	public NodeConfiguration setSuperNodeForCluster(NodeConfiguration nodeConfiguration){
+		NodeConfiguration configuration = server.setSupernodeForCluster(nodeConfiguration);
+		return configuration;
+	}
+	
+	public void getPeerPartnerForNode(String nodeName) throws NoSuchAlgorithmException, IOException{
+		NodeConfiguration configuration = getConfigurationForNode(nodeName);
+		if(configuration.getSupernodeURL() == null){
+			
+		}
+		else{
+			synchronize();
+		}
+	}
 
 	/**
-	 * Die Methode <code>listFiles</code> speichert alle Verzeichnisse und Dateien aus dem lokalen FileRepository in
-	 * eine Liste.
+	 * Die Methode <code>listFiles</code> speichert alle Verzeichnisse und
+	 * Dateien aus dem lokalen FileRepository in eine Liste.
 	 * 
 	 * @param directory
 	 * @return Eine Liste von <code>FileInfo</code>-Objekten.
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public List<FileInfo> listFiles(String directory) throws NoSuchAlgorithmException, IOException {
+	public List<FileInfo> listFiles(String directory)
+			throws NoSuchAlgorithmException, IOException {
 		if (repository.makeFileFromPath(directory).exists()) {
 			return repository.listFiles(directory);
 		}
@@ -69,8 +90,9 @@ public class Client {
 	}
 
 	/**
-	 * Wird die Methode aufgerufen wird überprüft, ob es sich um ein Verzeichnis handelt. Wenn ja, wird die Methode
-	 * {@link Client#removeDirectory(File)} aufgerufen. Wenn nicht, dann wird das File gelöscht.
+	 * Wird die Methode aufgerufen wird überprüft, ob es sich um ein Verzeichnis
+	 * handelt. Wenn ja, wird die Methode {@link Client#removeDirectory(File)}
+	 * aufgerufen. Wenn nicht, dann wird das File gelöscht.
 	 * 
 	 * @param file
 	 */
@@ -84,8 +106,9 @@ public class Client {
 
 	/**
 	 * Soll ein Verzeichnis gelöscht werden, wird die folgende Methode benötigt.
-	 * Es werden alle Dateien, die sich im Verzeichnis befinden in ein Array gespeichert.
-	 * Anhand einer for-Each-Schleife werden alle Files gelöscht. Anschließend wird das Verzeichnis selbst gelöscht.
+	 * Es werden alle Dateien, die sich im Verzeichnis befinden in ein Array
+	 * gespeichert. Anhand einer for-Each-Schleife werden alle Files gelöscht.
+	 * Anschließend wird das Verzeichnis selbst gelöscht.
 	 * 
 	 * @param directory
 	 */
@@ -98,8 +121,9 @@ public class Client {
 	}
 
 	/**
-	 * Die Methode erstellt ein File anhand des als Parameter übergebenen Pfades.
-	 * Danach wird die Methode {@link #makeParentDirectory(File)} aufgerufen.
+	 * Die Methode erstellt ein File anhand des als Parameter übergebenen
+	 * Pfades. Danach wird die Methode {@link #makeParentDirectory(File)}
+	 * aufgerufen.
 	 * 
 	 * @param path
 	 * @return Zurückgegeben wird ein FileOutputStream.
@@ -126,8 +150,8 @@ public class Client {
 	}
 
 	/**
-	 * Es wird überprüft, das Elternverzeichnis der Datei bereits existiert. Trifft dies nicht zu, wird das Verzeichnis
-	 * neu angelegt.
+	 * Es wird überprüft, das Elternverzeichnis der Datei bereits existiert.
+	 * Trifft dies nicht zu, wird das Verzeichnis neu angelegt.
 	 * 
 	 * @param file
 	 */
@@ -139,14 +163,16 @@ public class Client {
 	}
 
 	/**
-	 * Diese Methode löscht veraltete Dateien. Man vergleicht die Dateiliste des Servers mit der Dateiliste des Clients.
-	 * Befinden sich in der Client-Liste Verzeichnisse oder Dateien, die in der Server-Liste nicht vorhanden sind,
+	 * Diese Methode löscht veraltete Dateien. Man vergleicht die Dateiliste des
+	 * Servers mit der Dateiliste des Clients. Befinden sich in der Client-Liste
+	 * Verzeichnisse oder Dateien, die in der Server-Liste nicht vorhanden sind,
 	 * werden diese gelöscht.
 	 * 
 	 * @param serverFiles
 	 * @param clientFiles
 	 */
-	private void removeObsoleteFiles(List<FileInfo> serverFiles, List<FileInfo> clientFiles) {
+	private void removeObsoleteFiles(List<FileInfo> serverFiles,
+			List<FileInfo> clientFiles) {
 		for (FileInfo clientFile : clientFiles) {
 			if (!clientFile.isInList(serverFiles)) {
 				remove(clientFile.getName());
@@ -155,8 +181,8 @@ public class Client {
 	}
 
 	/**
-	 * Diese Methode wird in der {@link Main}-Klasse aufgerufen, um die Dateien|Verzeichnisse von zwei Clients zu
-	 * vergleichen.
+	 * Diese Methode wird in der {@link Main}-Klasse aufgerufen, um die
+	 * Dateien|Verzeichnisse von zwei Clients zu vergleichen.
 	 * 
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
@@ -166,16 +192,18 @@ public class Client {
 	}
 
 	/**
-	 * Zuerst wird die Liste der Files aus dem <code>RestRepository</code> ausgelesen.
-	 * Danach wird die Liste des Clients ausgelesen.
-	 * Veraltete Verzeichnisse und Dateien am Client werden gelöscht.
-	 * Danach wird, je nachdem ob es sich um ein Verzeichnis oder um eine Datei handelt, das jeweilige synchronisiert.
+	 * Zuerst wird die Liste der Files aus dem <code>RestRepository</code>
+	 * ausgelesen. Danach wird die Liste des Clients ausgelesen. Veraltete
+	 * Verzeichnisse und Dateien am Client werden gelöscht. Danach wird, je
+	 * nachdem ob es sich um ein Verzeichnis oder um eine Datei handelt, das
+	 * jeweilige synchronisiert.
 	 * 
 	 * @param directory
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 */
-	public void synchronizeDirectory(String directory) throws IOException, NoSuchAlgorithmException {
+	public void synchronizeDirectory(String directory) throws IOException,
+			NoSuchAlgorithmException {
 		List<FileInfo> serverFiles = server.listFiles(directory);
 		List<FileInfo> clientFiles = listFiles(directory);
 
@@ -191,32 +219,39 @@ public class Client {
 	}
 
 	/**
-	 * Diese Methode synchronisiert Files. Es wird zu Beginn die Methode {@link #isFileUpToDate(FileInfo)} aufgerufen.
-	 * Wird <b>false</b> zurückgegeben, wird der Filename ausgelesen, um diesen an einen OutputStream übergeben zu
-	 * können. Am Dateinamen wird noch die Endung <code>.part</code> angefügt.
-	 * Danach wird die Methode {@link Server#retrieveFile(String, OutputStream)} aufgerufen, um das entsprechende File
-	 * zu synchronisieren.
-	 * Im <code>finally</code>-Block wird dann der OutputStream geschlossen. War der File-Download erfolgreich, wird das
-	 * File umbenannt. Des weiteren wird das Änderungsdatum des kopierten Files manuell gesetzt.
+	 * Diese Methode synchronisiert Files. Es wird zu Beginn die Methode
+	 * {@link #isFileUpToDate(FileInfo)} aufgerufen. Wird <b>false</b>
+	 * zurückgegeben, wird der Filename ausgelesen, um diesen an einen
+	 * OutputStream übergeben zu können. Am Dateinamen wird noch die Endung
+	 * <code>.part</code> angefügt. Danach wird die Methode
+	 * {@link Server#retrieveFile(String, OutputStream)} aufgerufen, um das
+	 * entsprechende File zu synchronisieren. Im <code>finally</code>-Block wird
+	 * dann der OutputStream geschlossen. War der File-Download erfolgreich,
+	 * wird das File umbenannt. Des weiteren wird das Änderungsdatum des
+	 * kopierten Files manuell gesetzt.
 	 * 
 	 * @param fileInfo
 	 * @throws IOException
 	 * @throws NoSuchAlgorithmException
 	 * 
 	 */
-	private void synchronizeFile(FileInfo fileInfo) throws IOException, NoSuchAlgorithmException {
+	private void synchronizeFile(FileInfo fileInfo) throws IOException,
+			NoSuchAlgorithmException {
 		if (!isFileUpToDate(fileInfo)) {
 			long lastModified = fileInfo.getLastModified();
 			String fileName = fileInfo.getName();
 			log.info(fileInfo.getName() + " wird synchronisiert.");
 
-			OutputStream outputStream = createOutputStream(fileInfo.getName() + ".part");
+			OutputStream outputStream = createOutputStream(fileInfo.getName()
+					+ ".part");
 			try {
 				server.retrieveFile(fileName, outputStream);
 			} finally {
 				closeOutputStream(outputStream);
 				File temp = repository.getFile(fileInfo.getName() + ".part");
-				File currentFile = repository.makeFileFromPath(fileInfo.getName());
+				System.out.println(fileInfo.getName());
+				File currentFile = repository.makeFileFromPath(fileInfo
+						.getName());
 				if (currentFile.exists()) {
 					removeFile(currentFile);
 				}
@@ -226,35 +261,26 @@ public class Client {
 				ChecksumCreator checksum = new ChecksumCreator(currentFile);
 				String result = checksum.createChecksum();
 
-				log.info("Aktuelles File: " + currentFile.getName() + " | Hashwert : " + result);
-				log.info("Original File: " + fileInfo.getName() + " | Hashwert : " + fileInfo.getChecksum());
-
-				if (result.equals(fileInfo.getChecksum())) {
-					log.info("Download des Files " + currentFile.getName()
-								+ " war erfolgreich! Prüfsummen stimmen überein!");
-				} else {
-					log.info("Download des Files: " + currentFile.getName()
-								+ " war fehlerhaft! Prüfsummen stimmen nicht überein!");
-					currentFile.delete();
-					log.info("Fehlerhafte Datei: " + currentFile.getName() + " wurde gelöscht!");
-				}
+				log.info("Aktuelles File: " + currentFile.getName()
+						+ " | Hashwert : " + result);
 			}
 		} else {
 			if (log.isLoggable(DEBUG)) {
-				log.log(DEBUG, fileInfo.getName() + " ist aktuell. Datei wird nicht synchronisiert.");
+				log.log(DEBUG, fileInfo.getName()
+						+ " ist aktuell. Datei wird nicht synchronisiert.");
 			}
 		}
 	}
 
 	/**
-	 * Bei der Methode wird ein <code>FileInfo</code>-Objekt als Parameter übergeben.
-	 * Es wird ein neues File-Objekt erstellt. Existiert dieses File bereits im Verzeichnis, müssen
-	 * das Änderungsdatum der beiden zu synchronisierenden Files miteinander verglichen werden.
+	 * Bei der Methode wird ein <code>FileInfo</code>-Objekt als Parameter
+	 * übergeben. Es wird ein neues File-Objekt erstellt. Existiert dieses File
+	 * bereits im Verzeichnis, müssen das Änderungsdatum der beiden zu
+	 * synchronisierenden Files miteinander verglichen werden.
 	 * 
 	 * @param fileInfo
-	 * @return
-	 *         true - wenn das Änderungsdatum übereinstimmt. </br>
-	 *         false - wenn das Änderungsdatum unterschiedlich ist.
+	 * @return true - wenn das Änderungsdatum übereinstimmt. </br> false - wenn
+	 *         das Änderungsdatum unterschiedlich ist.
 	 */
 	public boolean isFileUpToDate(FileInfo fileInfo) {
 		File file = repository.makeFileFromPath(fileInfo.getName());

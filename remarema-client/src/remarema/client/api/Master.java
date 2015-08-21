@@ -5,6 +5,10 @@ public interface Master {
 
 	NodeConfiguration getConfigurationForNode(String nodeName);
 
-	boolean canIhazSupernodePleaz(NodeConfiguration nodeConfiguration);
+	NodeConfiguration setSuperNodeForCluster(String clusterName);
 
+	NodeConfiguration getConfigurationForParentCluster(String clustername);
+
+	NodeConfiguration getSupernodeFromParentCluster(String clustername);
 }
+	

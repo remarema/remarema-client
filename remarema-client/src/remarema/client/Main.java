@@ -16,8 +16,8 @@ import java.util.logging.Logger;
  */
 public class Main {
 
-	private static final String HOSTNAME = "http://a86008d7:58080/remarema-p2p/rest";
-	final static String DIRECTORY = "C:\\Users\\rpci343\\client_testordner";
+	private static final String HOSTNAME = "http://localhost:8080/remarema-p2p/rest";
+	final static String DIRECTORY = "C:\\Users\\Rebecca vanLangelaan\\Desktop\\ARZ\\Client";
 	private static final String LOGGER_NAME = "remarema-client";
 
 	/**
